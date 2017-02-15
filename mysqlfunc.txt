@@ -1,0 +1,83 @@
+CONNECTION_ID() 连接ID
+DATABASE() 当前数据库
+LAST_INSERT_ID() 最后插入函数的ID号
+USER() 当前用户
+VERSION() 版本信息
+MD5() 信息摘要算法（web应用）
+PASSWORD() 密码算法(修改用户密码)
+
+
+CRETAE FUNCTION func_name RETURN {STRING | INTEGER | REAL | DECIMAL} routine_body;
+/*
+  e.g.:
+	不带参数：
+	-->CREATE FUNCTION f1() RETURNS VARCHAR(30)
+	-->RETURN DATE_FORMAT(NOW(),"%Y年%m月%d %H点：%i分：%s秒");
+	带参数：
+	-->CREATE FUNCTION func2(num1 SMALLINT UNSIGNED, num2 SMALLINT UNSIGNED)
+	-->RETURNS FLOAT(10,2) UNSIGNED
+	-->RETURN (num1+num2)/2; 
+	复合结构:
+	-->DELIMITER //
+	-->CREATE FUNCTION func3(username VARCHR(20))
+	-->RETURNS INT UNSIGNED
+	-->BEGIN 
+	-->INSERT table(column) VALUE (username);
+	-->RETURN LAST_INSERT_ID();
+	-->END
+	-->//
+*/
+
+
+创建存储过程:
+	CREATE [DEFINER = {user | CURRENT_USER}]
+	PROCEDUER sp_name([proc_parameter[, ...]])
+	[characteristic ...] routine_body;
+
+	/*
+	proc_parameter: 
+	[IN | OUT | INOUT]param_name type
+	*/
+/*
+	无参数：
+	  创建： CREATE PROCEDURE sp1() SELECT VERSION;
+	  调用： CALL sp1(); | CALL sp1;
+	参数:
+	  创建：
+		-->DELIMITER //
+		-->CREATE PROCEDURE removeUserById(IN ip_d INT UNSIGNED)
+		-->BEGIN
+		-->DELETE FROM users WHERE id = p_id;
+		-->END;
+		-->//
+		-->DELIMITER ;
+	  调用：
+		-->CALL removeUserById(3);
+
+	  创建：
+		-->DELIMITER //
+		-->CREATE PROCEDURE removerUserAndReturnUserNums(IN p_id INT UNSIGNED, OUT userNums INT UNSIGNED)
+		-->BEGIN
+		-->DELETE FROM users WHERE id = p_id;
+		-->SELECT count(id) FROM users INTO userNums;
+/*		-->SET @userNums = count(id)*/
+		-->END
+		-->//
+		-->DELIMITER ;
+	  调用：
+		-->CALL removerUserAndReturnUserNums(27,@nums);
+/*
+SELECT @nums;
+*/
+/*SET @i =7*/
+
+	创建：
+		-->DELIMITER //
+		-->CREATE PROCEDURE removeUserByAgeAndReturnInfos(IN p_age SMALLINT UNSIGNED, OUT del_users SMALLINT IUNSIGNED, OUT user_counts SMALLINT UNSIGNED)
+		-->BEGIN
+		-->DELETE FROM users WHERE age = p_age;
+		-->SELECT ROW_COUNT() INTO del_users;
+		-->SELECT COUNT(id) FROM users INTO userCounts;
+		-->END;
+		-->//
+		-->DELIMITER ;
