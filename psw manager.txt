@@ -1,1 +1,0 @@
-mysql psw = psw0913
